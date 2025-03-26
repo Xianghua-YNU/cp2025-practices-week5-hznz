@@ -1,5 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+
+plt.rcParams['font.sans-serif'] = ['SimHei']
+plt.rcParams['axes.unicode_minus'] = False
 
 def random_walk_finals(num_steps=1000, num_walks=1000):
     """生成多个二维随机游走的终点位置
@@ -21,8 +25,15 @@ def random_walk_finals(num_steps=1000, num_walks=1000):
     # 1. 使用np.zeros初始化数组
     # 2. 使用np.random.choice生成随机步长
     # 3. 使用np.sum计算总位移
-    pass
+  
+    # 生成随机步长选择 (-1或1)
+    x_steps = np.random.choice([-1, 1], size=(num_walks, num_steps))
+    y_steps = np.random.choice([-1, 1], size=(num_walks, num_steps))
+    # 计算累计位移
+    x_finals = np.sum(x_steps, axis=1)
+    y_finals = np.sum(y_steps, axis=1)
 
+    return x_finals, y_finals
 
 def calculate_mean_square_displacement():
     """计算不同步数下的均方位移
@@ -40,7 +51,17 @@ def calculate_mean_square_displacement():
     # 1. 使用random_walk_finals获取终点坐标
     # 2. 计算位移平方和
     # 3. 使用np.mean计算平均值
-    pass
+   
+    steps = np.array([1000, 2000, 3000, 4000])
+    msd = np.zeros_like(steps, dtype=float)
+    
+    for i, num_steps in enumerate(steps):
+        x_finals, y_finals = random_walk_finals(num_steps=num_steps)
+        # 计算均方位移: r² = x² + y²
+        r_squared = x_finals**2 + y_finals**2
+        msd[i] = np.mean(r_squared)
+    
+    return steps, msd
 
 
 def analyze_step_dependence():
@@ -57,7 +78,16 @@ def analyze_step_dependence():
     # 1. 调用calculate_mean_square_displacement获取数据
     # 2. 使用最小二乘法拟合 msd = k * steps
     # 3. k = Σ(N·msd)/Σ(N²)
-    pass
+
+    steps, msd = calculate_mean_square_displacement()
+    
+    # 最小二乘拟合 msd = k * steps
+    # k = Σ(N·msd)/Σ(N²)
+    numerator = np.sum(steps * msd)
+    denominator = np.sum(steps**2)
+    k = numerator / denominator
+    
+    return steps, msd, k
 
 
 if __name__ == "__main__":
@@ -67,4 +97,27 @@ if __name__ == "__main__":
     # 2. 绘制实验数据点和理论曲线
     # 3. 设置图形属性
     # 4. 打印数据分析结果
-    pass
+    
+    steps, msd, k = analyze_step_dependence()
+    
+    # 绘制实验结果
+    plt.figure(figsize=(8, 6))
+    plt.scatter(steps, msd, label='实验数据', color='blue')
+    
+    # 绘制拟合曲线
+    fit_line = k * steps
+    plt.plot(steps, fit_line, label=f'拟合曲线: MSD = {k:.2f}×N', color='red', linestyle='--')
+    
+    plt.xlabel('步数 N', fontsize=12)
+    plt.ylabel('均方位移 MSD', fontsize=12)
+    plt.title('二维随机游走: 均方位移与步数的关系', fontsize=14)
+    plt.legend(fontsize=12)
+    plt.grid(True)
+    
+    # 打印分析结果
+    print("实验数据分析结果:")
+    print(f"拟合得到的比例系数 k = {k:.4f}")
+    print("均方位移与步数的关系: MSD ≈ k × N")
+    
+    plt.tight_layout()  # 自动调整子图参数，使之填充整个图像区域
+    plt.show()
