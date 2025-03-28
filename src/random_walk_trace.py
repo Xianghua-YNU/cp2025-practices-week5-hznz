@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def random_walk_2d(steps):
-      """Generate a 2D random walk trajectory"""
+    """Generate a 2D random walk trajectory"""
     x_step = np.random.choice([-1,1],steps)
     y_step = np.random.choice([-1,1],steps)
 
