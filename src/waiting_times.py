@@ -37,29 +37,29 @@ def plot_waiting_time_histogram(waiting_times, log_scale=False, n_flips=None):
         n_flips (int): 总抛掷次数（用于标题显示）
     """
     plt.figure(figsize=(10, 6))
-    # 动态分箱策略：数据量大时自动分箱，小时减少分箱数
+    
+    # 确定合适的bin数量
+    max_wait = max(waiting_times) if len(waiting_times) > 0 else 0
     bins = np.arange(0, max_wait + 2) - 0.5  # 确保每个整数值有一个bin
     
-    # 绘制概率密度直方图
-    counts, bins, _ = plt.hist(
-        waiting_times, 
-        bins=bins, 
-        density=True,       # 归一化为概率密度
-        alpha=0.7,         # 设置透明度
-        color='green' if log_scale else 'blue',
-        log=log_scale      # 控制y轴对数刻度
-    )
-    
-    # 动态生成标题
-    title = f'等待时间分布 (n={n_flips})' if n_flips else '等待时间分布'
-    if log_scale:
-        title = '半对数坐标' + title
-    
-    # 设置图形元素
-    plt.title(title)
+    # 绘制直方图
+    plt.hist(waiting_times, bins=bins, density=True, alpha=0.7)
     plt.xlabel('Waiting Time (Number of Tails)')
     plt.ylabel('Frequency' if not log_scale else 'Frequency (Log Scale)')
-    plt.grid(True, alpha=0.3)  # 显示网格线
+    
+    # 设置y轴为对数刻度（如果需要）
+    if log_scale:
+        plt.yscale('log')
+        title = 'Waiting Time Distribution (Semi-log Scale)'
+    else:
+        title = 'Waiting Time Distribution'
+    
+    # 在标题中添加抛硬币次数
+    if n_flips is not None:
+        title += f' - {n_flips:,} Coin Flips'
+    
+    plt.title(title)
+    plt.grid(True, alpha=0.3)
     plt.show()
 
 def analyze_waiting_time(waiting_times, p=0.08):
