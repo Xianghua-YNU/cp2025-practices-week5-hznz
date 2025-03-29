@@ -38,7 +38,7 @@ def plot_waiting_time_histogram(waiting_times, log_scale=False, n_flips=None):
     """
     plt.figure(figsize=(10, 6))
     # 动态分箱策略：数据量大时自动分箱，小时减少分箱数
-    bins = 'auto' if len(waiting_times) > 100 else max(1, len(waiting_times)//5)
+    bins = np.arange(0, max_wait + 2) - 0.5  # 确保每个整数值有一个bin
     
     # 绘制概率密度直方图
     counts, bins, _ = plt.hist(
@@ -57,9 +57,9 @@ def plot_waiting_time_histogram(waiting_times, log_scale=False, n_flips=None):
     
     # 设置图形元素
     plt.title(title)
-    plt.xlabel('两次正面之间的反面次数')
-    plt.ylabel('概率密度' + ('（对数刻度）' if log_scale else ''))
-    plt.grid(True, which='both', linestyle='--', alpha=0.5)  # 显示网格线
+    plt.xlabel('Waiting Time (Number of Tails)')
+    plt.ylabel('Frequency' if not log_scale else 'Frequency (Log Scale)')
+    plt.grid(True, alpha=0.3)  # 显示网格线
     plt.show()
 
 def analyze_waiting_time(waiting_times, p=0.08):
