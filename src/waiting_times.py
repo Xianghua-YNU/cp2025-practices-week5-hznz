@@ -31,14 +31,14 @@ def plot_waiting_time_histogram(waiting_times, log_scale=False, n_flips=None):
         title = '半对数坐标' + title
     plt.title(title)
     plt.xlabel('两次正面之间的反面次数')
-    plt.ylabel('概率密度' + ('（对数刻度）' if log_scale else ''))
+    plt.ylabel('概率密度' + ('（対数刻度）' if log_scale else ''))
     plt.grid(True, which='both', linestyle='--', alpha=0.5)
     plt.show()
 
 def analyze_waiting_time(waiting_times, p=0.08):
     """分析等待时间的统计特性"""
     stats = {}
-    if len(waiting_times) == 0:  # 修复括号错误
+    if len(waiting_times) == 0:
         stats["mean"] = np.nan
         stats["std"] = np.nan
     else:
@@ -58,7 +58,7 @@ def run_experiment(n_flips, title):
     
     if len(waiting_times) == 0:
         print("无法计算等待时间：正面出现次数不足")
-        return (np.array([]), {}
+        return (np.array([]), {})  # 修复括号未闭合问题
     
     stats = analyze_waiting_time(waiting_times)
     
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     np.random.seed(42)
     
     waiting_times_1k, stats_1k = run_experiment(1000, "任务一：1000次抛掷实验")
-    waiting_times_1m, stats_1m = run_experiment(1000000, "\n任务二：1,000,000次抛掷实验")
+    waiting_times_1m, stats_1m = run_experiment(1000000, "\n任务二：1,000,000次抛掷実験")
