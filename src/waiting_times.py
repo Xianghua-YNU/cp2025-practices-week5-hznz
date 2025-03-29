@@ -10,14 +10,13 @@ def calculate_waiting_times(coin_sequence):
     positions = np.nonzero(coin_sequence == 1)[0]
     if len(positions) < 2:
         return np.array([])
-    return np.diff(positions) - 1  # 间隔减1得到反面次数
+    return np.diff(positions) - 1
 
 def plot_waiting_time_histogram(waiting_times, log_scale=False, n_flips=None):
     """绘制等待时间直方图"""
     plt.figure(figsize=(10, 6))
     bins = 'auto' if len(waiting_times) > 100 else max(1, len(waiting_times)//5)
     
-    # 计算直方图数据
     counts, bins, _ = plt.hist(
         waiting_times, 
         bins=bins, 
@@ -27,7 +26,6 @@ def plot_waiting_time_histogram(waiting_times, log_scale=False, n_flips=None):
         log=log_scale
     )
     
-    # 设置坐标轴和标题
     title = f'等待时间分布 (n={n_flips})' if n_flips else '等待时间分布'
     if log_scale:
         title = '半对数坐标' + title
@@ -40,10 +38,14 @@ def plot_waiting_time_histogram(waiting_times, log_scale=False, n_flips=None):
 def analyze_waiting_time(waiting_times, p=0.08):
     """分析等待时间的统计特性"""
     stats = {}
-    stats["mean"] = np.mean(waiting_times) if len(waiting_times) > 0 else 0
-    stats["std"] = np.std(waiting_times) if len(waiting_times) > 0 else 0
-    stats["theoretical_mean"] = (1 - p) / p  # 几何分布均值
-    stats["exponential_mean"] = 1 / p        # 指数分布均值
+    if len(waiting_times) == 0:  # 修复括号错误
+        stats["mean"] = np.nan
+        stats["std"] = np.nan
+    else:
+        stats["mean"] = np.mean(waiting_times)
+        stats["std"] = np.std(waiting_times)
+    stats["theoretical_mean"] = (1 - p) / p
+    stats["exponential_mean"] = 1 / p
     return stats
 
 def run_experiment(n_flips, title):
@@ -51,34 +53,27 @@ def run_experiment(n_flips, title):
     print(f"\n{title}")
     print("-"*50)
     
-    # 生成序列并计算等待时间
     sequence = generate_coin_sequence(n_flips)
     waiting_times = calculate_waiting_times(sequence)
     
     if len(waiting_times) == 0:
         print("无法计算等待时间：正面出现次数不足")
-        return (np.array([]), {})
+        return (np.array([]), {}
     
-    # 分析统计特性
     stats = analyze_waiting_time(waiting_times)
     
-    # 打印统计结果
     print(f"实验平均等待时间: {stats['mean']:.2f}")
     print(f"理论均值（几何分布）: {stats['theoretical_mean']:.2f}")
     print(f"理论均值（指数分布）: {stats['exponential_mean']:.2f}")
     print(f"样本标准差: {stats['std']:.2f}")
     
-    # 绘制两种直方图
     plot_waiting_time_histogram(waiting_times, n_flips=n_flips)
     plot_waiting_time_histogram(waiting_times, log_scale=True, n_flips=n_flips)
     
     return (waiting_times, stats)
 
 if __name__ == "__main__":
-    np.random.seed(42)  # 固定随机种子
+    np.random.seed(42)
     
-    # 任务一：1000次抛掷
     waiting_times_1k, stats_1k = run_experiment(1000, "任务一：1000次抛掷实验")
-    
-    # 任务二：1000000次抛掷
     waiting_times_1m, stats_1m = run_experiment(1000000, "\n任务二：1,000,000次抛掷实验")
